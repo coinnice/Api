@@ -7,9 +7,12 @@ import java.io.IOException;
 
 public class RestJava {
 
+    /**
+     * API_SECRET 和 API_KEY需替换为您在COINNICE平台申请的
+     */
     static final String API_SECRET = "69aebb12-6b47-4858-b5ea-7056561466e4";
     private static final String API_KEY = "31c068b8-a61b-40d1-82e8-d6b6720274af";
-    private static final String BASE_URL = "http://localhost:18080";
+    private static final String BASE_URL = "http://www.coinnice.com";
 
     public static void main(String[] args) throws IOException {
 
