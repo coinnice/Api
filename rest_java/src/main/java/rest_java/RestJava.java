@@ -16,32 +16,29 @@ public class RestJava {
 
     public static void main(String[] args) throws IOException {
 
+        RestJavaUtil rest = new RestJavaUtil(BASE_URL, API_KEY, API_SECRET);
+
         System.out.println("获取行情信息");
-        String PATH_SB_TICKER = "/api/v1/spot/btc/ticker";
-        JSONObject ticker = RestJavaUtil.ticker(BASE_URL + PATH_SB_TICKER);
+        JSONObject ticker = rest.ticker();
         System.out.println(ticker.toJSONString());
 
         System.out.println("查询账户信息");
-        String PATH_SB_QUERY_USER_ACCOUNT = "/api/v1/spot/btc/queryUserAccount";
-        JSONObject account = RestJavaUtil.queryAccount(BASE_URL + PATH_SB_QUERY_USER_ACCOUNT,API_KEY );
+        JSONObject account = rest.queryAccount();
         System.out.println(account.toJSONString());
 
         System.out.println("下单");
-        String PATH_SB_ADD_USER_ORDER = "/api/v1/spot/btc/addUserOrder";
-        JSONObject order = RestJavaUtil.addOrder(BASE_URL + PATH_SB_ADD_USER_ORDER, API_KEY, "0", "4500", "0.1");
+        JSONObject order = rest.addOrder("0", "4500", "0.1");
         System.out.println(order.toJSONString());
 
 
         System.out.println("查询挂单");
-        String PATH_SB_QUERY_USER_ORDER = "/api/v1/spot/btc/queryUserOrder";
-        JSONObject allOrder = RestJavaUtil.queryOrder(BASE_URL + PATH_SB_QUERY_USER_ORDER, API_KEY, "1", "10");
+        JSONObject allOrder = rest.queryOrder("1", "10");
         System.out.println(allOrder.toJSONString());
 
         JSONArray orders = allOrder.getObject("obj", JSONArray.class);
         for (int i = 0; i < orders.size() ; i++) {
             System.out.println("撤单");
-            String PATH_SB_REMOVE_USER_ORDER = "/api/v1/spot/btc/removeUserOrder";
-            JSONObject removeOrder = RestJavaUtil.removeOrder(BASE_URL+ PATH_SB_REMOVE_USER_ORDER, API_KEY,orders.getJSONObject(i).getString("id"));
+            JSONObject removeOrder = rest.removeOrder(orders.getJSONObject(i).getString("id"));
             System.out.println(removeOrder.toJSONString());
         }
     }

@@ -18,49 +18,56 @@ import java.util.TreeMap;
 
 class RestJavaUtil {
 
+    private String apiSecret;
+    private String apiKey;
+    private String baseUrl;
 
-    private static String API_SECRET = RestJava.API_SECRET;
+    public RestJavaUtil(String baseUrl,String apiKey,String apiSecret){
+        this.baseUrl = baseUrl;
+        this.apiKey = apiKey;
+        this.apiSecret = apiSecret;
+    }
 
-    static JSONObject removeOrder(String url, String apiKey, String orderId) throws IOException {
+    public JSONObject removeOrder(String orderId) throws IOException {
         TreeMap<String, String> tm = new TreeMap<String, String>();
         tm.put("apiKey", apiKey);
         tm.put("orderId", orderId);
         tm.put("sign", sign(tm));
-        return RestJavaUtil.post(url, convertTostr(tm));
+        return post(baseUrl+"/api/v1/spot/btc/removeUserOrder", convertTostr(tm));
     }
 
-    static JSONObject queryOrder(String url, String apiKey, String page, String psize) throws IOException {
+    public JSONObject queryOrder(String page, String psize) throws IOException {
         TreeMap<String, String> tm = new TreeMap<String,String>();
         tm.put("apiKey", apiKey);
         tm.put("page", page);
         tm.put("psize", psize);
         tm.put("sign", sign(tm));
-        return RestJavaUtil.post(url, convertTostr(tm));
+        return post(baseUrl+"/api/v1/spot/btc/queryUserOrder", convertTostr(tm));
     }
 
-    static JSONObject addOrder(String url, String apiKey, String direction, String price, String amount) throws IOException {
+    public JSONObject addOrder(String direction, String price, String amount) throws IOException {
         TreeMap<String, String> tm = new TreeMap<String, String>();
         tm.put("apiKey", apiKey);
         tm.put("direction", direction);
         tm.put("price", price);
         tm.put("amount", amount);
         tm.put("sign", sign(tm));
-        return RestJavaUtil.post(url, convertTostr(tm));
+        return post(baseUrl+"/api/v1/spot/btc/addUserOrder", convertTostr(tm));
     }
 
-    static JSONObject queryAccount(String url, String apiKey) throws IOException {
+    public JSONObject queryAccount() throws IOException {
         TreeMap<String, String> tm = new TreeMap<String,String>();
         tm.put("apiKey", apiKey);
         tm.put("sign", sign(tm));
         String convertTostr = convertTostr(tm);
-        return RestJavaUtil.post(url, convertTostr);
+        return post(baseUrl+"/api/v1/spot/btc/queryUserAccount", convertTostr);
     }
 
-    static JSONObject ticker(String url) throws IOException {
-        return RestJavaUtil.get(url);
+    public JSONObject ticker() throws IOException {
+        return get(baseUrl+"/api/v1/spot/btc/ticker");
     }
 
-    private static JSONObject get(String url) throws IOException {
+    private JSONObject get(String url) throws IOException {
         HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse response = createHttpClient().execute(httpGet);
         try{
@@ -75,7 +82,7 @@ class RestJavaUtil {
         return null;
     }
 
-    private static JSONObject post(String url,String body) throws IOException {
+    private JSONObject post(String url,String body) throws IOException {
         HttpPost post = new HttpPost(url);
         HttpEntity httpEntity = new StringEntity(body);
         post.setEntity(httpEntity);
@@ -92,10 +99,10 @@ class RestJavaUtil {
         return null;
     }
 
-    private static CloseableHttpClient createHttpClient(){
+    private CloseableHttpClient createHttpClient(){
         return HttpClients.custom().build();
     }
-    private static String convertTostr(TreeMap<String, String> tm) {
+    private String convertTostr(TreeMap<String, String> tm) {
 
         StringBuilder sb = new StringBuilder();
         Iterator<Map.Entry<String, String>> iterator = tm.entrySet().iterator();
@@ -107,14 +114,14 @@ class RestJavaUtil {
         return sb.substring(0, sb.length() - 1);
     }
 
-    private  static String sign(TreeMap<String, String> params){
+    private  String sign(TreeMap<String, String> params){
         StringBuilder sb = new StringBuilder();
         Iterator<Map.Entry<String, String>> iterator = params.entrySet().iterator();
         while(iterator.hasNext()){
             Map.Entry<String, String> param = iterator.next();
             sb.append(param.getKey()).append("=").append(param.getValue().toString()).append("&");
         }
-        sb.append("apiSecret=").append(API_SECRET);
+        sb.append("apiSecret=").append(apiSecret);
         return Md5Util.md5Coin(sb.toString());
     }
 
