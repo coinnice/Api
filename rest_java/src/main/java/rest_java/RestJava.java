@@ -12,7 +12,7 @@ public class RestJava {
      */
     static final String API_SECRET = "69aebb12-6b47-4858-b5ea-7056561466e4";
     private static final String API_KEY = "31c068b8-a61b-40d1-82e8-d6b6720274af";
-    private static final String BASE_URL = "http://www.coinnice.com";
+    private static final String BASE_URL = "https://www.coinnice.com";
 
     public static void main(String[] args) throws IOException {
 
@@ -27,7 +27,7 @@ public class RestJava {
         System.out.println(account.toJSONString());
 
         System.out.println("下单");
-        JSONObject order = rest.addOrder("0", "4500", "0.1");
+        JSONObject order = rest.addOrder("0", "4500", "0.1","1");
         System.out.println(order.toJSONString());
 
 

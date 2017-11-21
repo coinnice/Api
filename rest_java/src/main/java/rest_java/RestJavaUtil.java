@@ -45,12 +45,13 @@ class RestJavaUtil {
         return post(baseUrl+"/api/v1/spot/btc/queryUserOrder", convertTostr(tm));
     }
 
-    public JSONObject addOrder(String direction, String price, String amount) throws IOException {
+    public JSONObject addOrder(String direction, String price, String amount,String currency) throws IOException {
         TreeMap<String, String> tm = new TreeMap<String, String>();
         tm.put("apiKey", apiKey);
         tm.put("direction", direction);
         tm.put("price", price);
         tm.put("amount", amount);
+        tm.put("currency",currency);
         tm.put("sign", sign(tm));
         return post(baseUrl+"/api/v1/spot/btc/addUserOrder", convertTostr(tm));
     }

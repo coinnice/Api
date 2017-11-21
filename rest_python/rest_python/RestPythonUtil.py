@@ -1,4 +1,5 @@
 import http.client
+import urllib.request
 import json
 import hashlib
 
@@ -16,8 +17,14 @@ class RestPythonService:
         self.__apiSecret = api_secret
         self.__host = host
 
+    def __getConn(self):
+        if self.__port == 443:
+            return http.client.HTTPSConnection(host=self.__host, port=self.__port)
+        else:
+            return http.client.HTTPConnection(host=self.__host, port=self.__port)
+
     def ticker(self) -> dict:
-        h = http.client.HTTPConnection(host=self.__host, port=self.__port)
+        h = self.__getConn()
         h.request("GET", '/api/v1/spot/btc/ticker')
         r = h.getresponse()
         data = None
@@ -25,6 +32,7 @@ class RestPythonService:
             data = json.load(r)
         h.close()
         return data
+
 
     def query_account(self) -> dict:
         params = {
@@ -44,7 +52,7 @@ class RestPythonService:
 
     def __post(self, url: str, body: str) -> dict:
         headers = {"Content-type": "application/x-www-form-urlencoded"}
-        conn = http.client.HTTPConnection(host=self.__host, port=self.__port)
+        conn = self.__getConn()
         conn.request(method="POST", url=url, body=body, headers=headers)
         r = conn.getresponse()
         data = {}
@@ -67,12 +75,13 @@ class RestPythonService:
         m.update(bytes(''.join(l), "UTF-8"))
         return str(m.hexdigest())
 
-    def add_order(self,direction:str,price:str,amount:str) -> dict:
+    def add_order(self,direction:str,price:str,amount:str,currency:str) -> dict:
         params={
             "apiKey":self.__apiKey,
             "direction":direction,
             "price":price,
-            "amount":amount
+            "amount":amount,
+            "currency":currency
         }
         params["sign"]=self.__sign(params)
         return self.__post(url="/api/v1/spot/btc/addUserOrder",body=self.__convert_to_str(params))
