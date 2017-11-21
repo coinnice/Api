@@ -11,7 +11,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
@@ -21,6 +28,7 @@ class RestJavaUtil {
     private String apiSecret;
     private String apiKey;
     private String baseUrl;
+    private static SSLContext context;
 
     public RestJavaUtil(String baseUrl,String apiKey,String apiSecret){
         this.baseUrl = baseUrl;
@@ -101,7 +109,7 @@ class RestJavaUtil {
     }
 
     private CloseableHttpClient createHttpClient(){
-        return HttpClients.custom().build();
+        return HttpClients.custom().setSSLContext(context).build();
     }
     private String convertTostr(TreeMap<String, String> tm) {
 
@@ -126,5 +134,28 @@ class RestJavaUtil {
         return Md5Util.md5Coin(sb.toString());
     }
 
-
+    static {
+        try {
+            context = SSLContext.getInstance("SSL");
+            context.init(
+                    null,
+                    new TrustManager[] {new X509TrustManager() {
+                        @Override
+                        public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+                        }
+                        @Override
+                        public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+                        }
+                        @Override
+                        public X509Certificate[] getAcceptedIssuers() {
+                            return new X509Certificate[0];
+                        }
+                    }},
+                    null);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+    }
 }
